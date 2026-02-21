@@ -1,4 +1,6 @@
-<?php require 'productos.php'; ?>
+<?php
+require 'productos.php';
+?>
 
 <!DOCTYPE html>
 
@@ -133,6 +135,7 @@
             <?php endforeach; ?>
         </tbody>
     </table>
+<?php include 'controles_paginacion.php'; ?>
 
     <!-- Modal de Confirmación Moderno -->
     <div id="deleteModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
