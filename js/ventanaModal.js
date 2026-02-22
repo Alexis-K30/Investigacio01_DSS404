@@ -1,12 +1,19 @@
-// Variables para el modal de eliminación
+// Variables para los modales
 const deleteModal = document.getElementById('deleteModal');
 const deleteOverlay = document.getElementById('modalOverlay');
 const deletePanel = document.getElementById('modalPanel');
 
-// Variables para el modal de venta
 const ventaModal = document.getElementById('ventaModal');
 const ventaOverlay = document.getElementById('ventaOverlay');
 const ventaPanel = document.getElementById('ventaPanel');
+
+const confirmarVentaModal = document.getElementById('confirmarVentaModal');
+const confirmarVentaOverlay = document.getElementById('confirmarVentaOverlay');
+const confirmarVentaPanel = document.getElementById('confirmarVentaPanel');
+
+// Variables para almacenar datos de la venta
+let datosVentaActual = null;
+let formVentaActual = null;
 
 // ===== FUNCIONES PARA MODAL DE ELIMINACIÓN =====
 function abrirModalEliminar(id) {
@@ -65,6 +72,102 @@ function cerrarModalVenta() {
     }, 300);
 }
 
+// ===== FUNCIONES PARA MODAL DE CONFIRMACIÓN DE VENTA =====
+function abrirConfirmarVentaModal() {
+    confirmarVentaModal.classList.remove('hidden');
+    setTimeout(() => {
+        confirmarVentaOverlay.classList.remove('opacity-0');
+        confirmarVentaPanel.classList.remove('scale-95', 'opacity-0');
+        confirmarVentaPanel.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function cerrarConfirmarVentaModal() {
+    confirmarVentaOverlay.classList.add('opacity-0');
+    confirmarVentaPanel.classList.remove('scale-100', 'opacity-100');
+    confirmarVentaPanel.classList.add('scale-95', 'opacity-0');
+
+    setTimeout(() => {
+        confirmarVentaModal.classList.add('hidden');
+        // Volver a abrir el modal de venta si se canceló
+        if (datosVentaActual) {
+            setTimeout(() => {
+                abrirModalVenta(
+                    datosVentaActual.id,
+                    datosVentaActual.nombre,
+                    datosVentaActual.stock,
+                    datosVentaActual.precioUnitario
+                );
+            }, 300);
+        }
+    }, 300);
+}
+
+// ===== PROCESAR VENTA =====
+function procesarVenta() {
+    if (formVentaActual && datosVentaActual) {
+        // Cerrar modal de confirmación
+        cerrarConfirmarVentaModal();
+        
+        // Pequeña pausa para mejor experiencia visual
+        setTimeout(() => {
+            // Enviar el formulario
+            formVentaActual.submit();
+        }, 300);
+    }
+}
+
+// ===== VALIDAR Y PREPARAR VENTA =====
+function prepararVenta() {
+    const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+    const stock = parseInt(document.getElementById('ventaStockDisponible').textContent);
+    const productoId = document.getElementById('ventaProductoId').value;
+    const productoNombre = document.getElementById('ventaProductoNombre').textContent;
+    const precioUnitario = parseFloat(document.getElementById('ventaPrecioUnitario').textContent);
+    const total = cantidad * precioUnitario;
+    
+    // Validar cantidad
+    if (!cantidad || cantidad <= 0) {
+        alert('Por favor ingresa una cantidad válida');
+        return false;
+    }
+    
+    if (cantidad > stock) {
+        alert(`No hay suficiente stock. Disponible: ${stock}`);
+        return false;
+    }
+    
+    // Guardar datos para la confirmación
+    datosVentaActual = {
+        id: productoId,
+        nombre: productoNombre,
+        cantidad: cantidad,
+        precioUnitario: precioUnitario,
+        total: total,
+        stock: stock
+    };
+    
+    // Obtener el formulario
+    formVentaActual = document.querySelector('#ventaModal form');
+    
+    // Llenar modal de confirmación
+    document.getElementById('confirmarProductoNombre').textContent = productoNombre;
+    document.getElementById('confirmarCantidad').textContent = cantidad;
+    document.getElementById('confirmarPrecioUnitario').textContent = precioUnitario.toFixed(2);
+    document.getElementById('confirmarTotal').textContent = total.toFixed(2);
+    
+    // Cerrar modal de venta
+    cerrarModalVenta();
+    
+    // Pequeña pausa para mejor experiencia visual
+    setTimeout(() => {
+        // Abrir modal de confirmación
+        abrirConfirmarVentaModal();
+    }, 300);
+    
+    return false; // Prevenir envío del formulario
+}
+
 // ===== CÁLCULO DE TOTAL EN VENTA =====
 document.addEventListener('DOMContentLoaded', function() {
     const cantidadInput = document.getElementById('ventaCantidad');
@@ -113,36 +216,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.value = 1;
             } else if (valor > stock) {
                 this.value = stock;
+                // Disparar evento input para actualizar total
+                this.dispatchEvent(new Event('input'));
             }
         });
     }
 });
 
-// ===== VALIDAR VENTA ANTES DE ENVIAR =====
-function validarVenta() {
-    const cantidad = parseInt(document.getElementById('ventaCantidad').value);
-    const stock = parseInt(document.getElementById('ventaStockDisponible').textContent);
-    
-    if (!cantidad || cantidad <= 0) {
-        alert('Por favor ingresa una cantidad válida');
-        return false;
-    }
-    
-    if (cantidad > stock) {
-        alert(`No hay suficiente stock. Disponible: ${stock}`);
-        return false;
-    }
-    
-    return confirm('¿Confirmar la venta por ' + document.getElementById('ventaTotal').textContent + '?');
-}
-
 // ===== CERRAR MODALES CON TECLA ESCAPE =====
 document.addEventListener('keydown', function (event) {
     if (event.key === "Escape") {
-        if (ventaModal && !ventaModal.classList.contains('hidden')) {
+        if (confirmarVentaModal && !confirmarVentaModal.classList.contains('hidden')) {
+            cerrarConfirmarVentaModal();
+        } else if (ventaModal && !ventaModal.classList.contains('hidden')) {
+            cerrarModalVenta();
+        } else if (deleteModal && !deleteModal.classList.contains('hidden')) {
+            cerrarModalEliminar();
+        }
+    }
+});
+
+// ===== CERRAR MODALES AL HACER CLICK FUERA =====
+document.addEventListener('click', function(event) {
+    if (confirmarVentaModal && !confirmarVentaModal.classList.contains('hidden')) {
+        if (!confirmarVentaPanel.contains(event.target) && !event.target.closest('#confirmarVentaModal button')) {
+            cerrarConfirmarVentaModal();
+        }
+    }
+    
+    if (ventaModal && !ventaModal.classList.contains('hidden')) {
+        if (!ventaPanel.contains(event.target) && !event.target.closest('#ventaModal button')) {
             cerrarModalVenta();
         }
-        if (deleteModal && !deleteModal.classList.contains('hidden')) {
+    }
+    
+    if (deleteModal && !deleteModal.classList.contains('hidden')) {
+        if (!deletePanel.contains(event.target) && !event.target.closest('#deleteModal button') && !event.target.closest('#confirmDeleteBtn')) {
             cerrarModalEliminar();
         }
     }
