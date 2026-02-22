@@ -185,7 +185,7 @@ require 'productos.php';
             <div id="ventaOverlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300 ease-out opacity-0" aria-hidden="true" onclick="cerrarModalVenta()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div id="ventaPanel" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full duration-300 ease-out scale-95 opacity-0">
-                <form action="vender.php" method="POST" onsubmit="return validarVenta()">
+                <form action="vender.php" method="POST" onsubmit="return prepararVenta()">
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
                             <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -237,6 +237,51 @@ require 'productos.php';
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Venta -->
+    <div id="confirmarVentaModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-confirmar-venta-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div id="confirmarVentaOverlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300 ease-out opacity-0" aria-hidden="true" onclick="cerrarConfirmarVentaModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div id="confirmarVentaPanel" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full duration-300 ease-out scale-95 opacity-0">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-confirmar-venta-title">Confirmar Venta</h3>
+                            <div class="mt-4 bg-gray-50 p-4 rounded">
+                                <p class="text-sm text-gray-600 mb-2">
+                                    <span class="font-semibold">Producto:</span> <span id="confirmarProductoNombre"></span>
+                                </p>
+                                <p class="text-sm text-gray-600 mb-2">
+                                    <span class="font-semibold">Cantidad:</span> <span id="confirmarCantidad"></span>
+                                </p>
+                                <p class="text-sm text-gray-600 mb-2">
+                                    <span class="font-semibold">Precio unitario:</span> $<span id="confirmarPrecioUnitario"></span>
+                                </p>
+                                <p class="text-lg font-bold text-green-600 mt-3 pt-3 border-t border-gray-200">
+                                    Total: $<span id="confirmarTotal"></span>
+                                </p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3">¿Estás seguro de realizar esta venta?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="procesarVenta()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
+                        Sí, confirmar venta
+                    </button>
+                    <button type="button" onclick="cerrarConfirmarVentaModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
+                        Cancelar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
