@@ -107,24 +107,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// Validaciones adicionales para el modal de venta
-document.addEventListener('DOMContentLoaded', function() {
-    const ventaCantidad = document.getElementById('ventaCantidad');
-    
-    if (ventaCantidad) {
-        ventaCantidad.addEventListener('blur', function() {
-            const valor = parseInt(this.value);
-            const stock = parseInt(document.getElementById('ventaStockDisponible').textContent);
-            
-            if (this.value === '' || isNaN(valor)) {
-                this.value = '';
-            } else if (valor < 1) {
-                this.value = 1;
-            } else if (valor > stock) {
-                this.value = stock;
-                alert(`La cantidad máxima disponible es ${stock}`);
-            }
-        });
-    }
-});
