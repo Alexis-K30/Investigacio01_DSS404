@@ -2,6 +2,7 @@
 session_start();
 
 require_once 'Paginacion.php';
+
 // Inicializar la matriz de productos en sesión si no existe
 if (!isset($_SESSION['productos'])) {
     $_SESSION['productos'] = [
@@ -51,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
 // Paginación
 $pagina_actual = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $todos_productos = $_SESSION['productos'];
@@ -64,5 +64,4 @@ $paginacion = new Paginacion(6, $pagina_actual, $total_productos);
 $offset = $paginacion->getOffset();
 $limit = $paginacion->getLimit();
 $productos = array_slice($todos_productos, $offset, $limit);
-
-
+?>
