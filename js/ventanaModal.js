@@ -89,17 +89,6 @@ function cerrarConfirmarVentaModal() {
 
     setTimeout(() => {
         confirmarVentaModal.classList.add('hidden');
-        // Volver a abrir el modal de venta si se canceló
-        if (datosVentaActual) {
-            setTimeout(() => {
-                abrirModalVenta(
-                    datosVentaActual.id,
-                    datosVentaActual.nombre,
-                    datosVentaActual.stock,
-                    datosVentaActual.precioUnitario
-                );
-            }, 300);
-        }
     }, 300);
 }
 
@@ -236,23 +225,53 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// ===== CERRAR MODALES AL HACER CLICK FUERA =====
+// ===== CERRAR MODALES AL HACER CLICK FUERA (CORREGIDO) =====
 document.addEventListener('click', function(event) {
+    // Para modal de confirmación de venta
     if (confirmarVentaModal && !confirmarVentaModal.classList.contains('hidden')) {
-        if (!confirmarVentaPanel.contains(event.target) && !event.target.closest('#confirmarVentaModal button')) {
+        // Si el click fue en el overlay (fondo gris) y no en el panel
+        if (event.target === confirmarVentaOverlay || event.target === confirmarVentaModal) {
             cerrarConfirmarVentaModal();
         }
     }
     
+    // Para modal de venta
     if (ventaModal && !ventaModal.classList.contains('hidden')) {
-        if (!ventaPanel.contains(event.target) && !event.target.closest('#ventaModal button')) {
+        // Si el click fue en el overlay (fondo gris) y no en el panel
+        if (event.target === ventaOverlay || event.target === ventaModal) {
             cerrarModalVenta();
         }
     }
     
+    // Para modal de eliminación
     if (deleteModal && !deleteModal.classList.contains('hidden')) {
-        if (!deletePanel.contains(event.target) && !event.target.closest('#deleteModal button') && !event.target.closest('#confirmDeleteBtn')) {
+        // Si el click fue en el overlay (fondo gris) y no en el panel
+        if (event.target === deleteOverlay || event.target === deleteModal) {
             cerrarModalEliminar();
         }
+    }
+});
+
+// Prevenir que los clics dentro de los paneles se propaguen al overlay
+document.addEventListener('DOMContentLoaded', function() {
+    // Para panel de eliminación
+    if (deletePanel) {
+        deletePanel.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    }
+    
+    // Para panel de venta
+    if (ventaPanel) {
+        ventaPanel.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    }
+    
+    // Para panel de confirmación de venta
+    if (confirmarVentaPanel) {
+        confirmarVentaPanel.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
     }
 });
